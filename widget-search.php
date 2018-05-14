@@ -243,7 +243,7 @@ class bookyourtravel_search_widget extends WP_Widget {
 		$l = isset($_GET['l']) ? intval(wp_kses($_GET['l'], array())) : 0;
 		
 		$locations_select = '<select id="search_widget_term" name="l">';
-		$locations_select .= '<option value="">' . esc_html__('Select location', 'bookyourtravel') . '</option>';
+		$locations_select .= '<option value="">' . esc_html__('Τοποθεσία', 'bookyourtravel') . '</option>';
 		$location_results = $bookyourtravel_location_helper->list_locations(0, 1, -1, 'title', 'asc');
 		if ( count($location_results) > 0 && $location_results['total'] > 0 ) {
 			foreach ($location_results['results'] as $location_result) {
@@ -263,7 +263,7 @@ class bookyourtravel_search_widget extends WP_Widget {
 					window.searchTourLocationLabel = <?php echo json_encode($where_text); ?>;
 					window.searchCruiseLocationLabel = <?php echo json_encode($where_text); ?>;
 				</script>
-				<div class="destination">
+				<div class="destination" style="top: -17px;">
 					<label for="search_widget_term"><?php echo $location_select_label_text; ?></label>
 					<?php echo $locations_select; ?>
 				</div>
@@ -461,39 +461,34 @@ class bookyourtravel_search_widget extends WP_Widget {
 	
 		$request_type_ids = array();
 		if (isset($_GET['tour_types'])) {
-			$request_type_ids = BookYourTravel_Theme_Utils::retrieve_array_of_values_from_query_string('tour_types', true);
-		}
-	
+		$request_type_ids = BookYourTravel_Theme_Utils::retrieve_array_of_values_from_query_string('tour_types', true);
+			}
 		$args = array( 
 			'taxonomy'=>'tour_type', 
 			'hide_empty'=>'0'
 		);
 		$tour_types = get_categories($args);
-		
+
+		 $t = isset($_GET['tour_types']) ? intval(wp_kses($_GET['tour_types'], '')) : 0;
+
+		 $location_types = '<select id="search_widget_term" name="tour_types">';
+		 $location_types .= '<option value="">' . __('Τύπος Εκδρομής ', 'bookyourtravel') . '</option>';
 		if (count($tour_types) > 0) {
+			foreach ($tour_types as $tour_type) {
+				$location_types .= '<option value="' . esc_attr($tour_type->term_id) . '" ' . ($tour_type->term_id == $t  ? 'selected' : '') . ' >' . $tour_type->name . '</option>';
+			}
+		}
+		$location_types .= '</select>';
 	?>	
 		<div class="column">
 			<div class="tour_type dt"><?php echo $tour_type_label_text; ?></div>
 			<div class="tour_type dd">
-			<?php for ($i = 0; $i < count($tour_types); $i++) { 
-				if (isset($tour_types[$i])) {
-				$tour_type = $tour_types[$i];
-				
-				$checked = '';
-				if (in_array($tour_type->term_id, $request_type_ids)) {
-					$checked = " checked='checked' ";
-				}
-			?>
-				<div class="checkbox">
-					<input <?php echo $checked; ?> value="<?php echo esc_attr( $tour_type->term_id ); ?>" type="checkbox" id="ct<?php echo $i + 1; ?>" name="tour_types[]" />
-					<label for="ct<?php echo $i + 1; ?>"><?php echo esc_attr( $tour_type->name ); ?></label>
+				<div class="destination">
+					<label for="search_widget_term" style="width: 100%;"><?php echo $location_types ?></label>
 				</div>
-			<?php } 		
-			}?>
 			</div>
 		</div>	
-	<?php
-		}	
+		<?php
 	}
 	
 	function render_user_rating_section($user_rating_label_text) {
